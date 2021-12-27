@@ -1,0 +1,33 @@
+---
+title: "Análisis exploratorio unidimensional (ejecuciones)"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+author:
+- Andrés Millán
+- Paula Villanueva
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    theme: united
+    highlight: tango
+
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    theme: united
+    highlight: tango
+---
+
+# Abstract
+
+# Introducción
+
+# Materiales y métodos
+
+# Resultados
+
+# Discusión
+
+# Conclusiones

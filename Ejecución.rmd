@@ -1,0 +1,43 @@
+---
+title: "Análisis exploratorio unidimensional (ejecuciones)"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+author:
+- Andrés Millán
+- Paula Villanueva
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    theme: united
+    highlight: tango
+
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    theme: united
+    highlight: tango
+---
+
+## Análisis exploratorio univariante
+
+### Recodificaciones
+### Valores perdidos
+### Análisis descriptivo numérico clásico
+### Valores extremos
+### Supuesto de normalidad
+### Otros aspectos
+
+## Análisis exploratorio multivariante
+
+### Correlación entre variables (test de Barlett)
+### Tratar outliers si no se ha hecho antes
+### Si no se han tratado los NaN, hacerlo ahora
+### Reducción de dimensión mediante variables observables
+### Reducción de dimensión mediante variables latentes
+### Análisis de la normalidad multivariante
+### Clasificador mediante análisis discriminante
+#### Lineal
+#### Cuadrático
+### Validación básica; matriz de confusión
