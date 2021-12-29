@@ -11,7 +11,6 @@ output:
     number_sections: true
     theme: united
     highlight: tango
-
   pdf_document:
     toc: true
     toc_depth: 3
@@ -20,24 +19,321 @@ output:
     highlight: tango
 ---
 
-## Análisis exploratorio univariante
+# Análisis exploratorio univariante
 
-### Recodificaciones
-### Valores perdidos
-### Análisis descriptivo numérico clásico
-### Valores extremos
-### Supuesto de normalidad
-### Otros aspectos
+Información del dataset:
 
-## Análisis exploratorio multivariante
+> Un grupo constituido por 13 empresas se ha clasficiado según las puntuaciones obtenidas en 8 indicadores económicos:
+>
+> - X1: Indicador de volumen de facturación.
+> - X2: Indicador de nivel de nueva contratación.
+> - X3: Indicador del total de clientes.
+> - X4: Indicador de beneficios de la empresa .
+> - X5: Indicador de de retribución salarial de los empleados.
+> - X6: Indicador de organización empresarial dentro de la empresa.
+> - X7: Indicador de relaciones con otras empresas.
+> - X8: Indicador de nivel de equipamiento (ordenadores, maquinaria, etc...).
 
-### Correlación entre variables (test de Barlett)
-### Tratar outliers si no se ha hecho antes
-### Si no se han tratado los NaN, hacerlo ahora
-### Reducción de dimensión mediante variables observables
-### Reducción de dimensión mediante variables latentes
-### Análisis de la normalidad multivariante
-### Clasificador mediante análisis discriminante
-#### Lineal
-#### Cuadrático
-### Validación básica; matriz de confusión
+Comenzamos cargando la base de datos con el siguiente comando y mostramos los datos que contiene.
+
+```{R}
+library(foreign)
+datos <- read.spss("./datasets/DB_2.sav", to.data.frame = TRUE, reencode = "utf-8")
+datos
+```
+
+De hecho, nos dicen que hay 13 empresas, no 14. Esto nos hace sospechar que hay una fila errónea (sus).
+
+
+## Recodificaciones
+
+No es necesario recodificar o agrupar los datos, pues como observamos en el archivo de datos, tenemos que
+todas las variables son numéricas.
+
+
+## Valores perdidos
+
+Veamos un resumen general de los datos con el siguiente comando.
+
+```{R}
+summary(datos)
+```
+
+Observamos que la variable `x7` tiene un valor perdido, así como la variable `x8`.
+Por lo que el porcentaje de valores perdidos de las variables `x1`,...,`x6` es del 0%,
+y de las variables `x7` y `x8` es del 0.071428%.
+
+Además, nos llama la atención que la media de la variable `x1` obtenga un valor demasiado elevado.
+Esto se debe a que en la fila 14 hay un valor muy grande y hace que se alteren las medidas que resumen
+a las variables. Asimismo, como habíamos mencionado antes, la fila 14 es la que tiene los valores perdidos
+y, como todo indica que las primeras 13 filas corresponden a las 13 primeras empresas,
+procedemos a eliminar esta última fila con el siguiente comando.
+
+```{R}
+datos <- datos[-14, ]
+colSums(is.na(datos))
+```
+
+Como no tenemos más valores perdidos en el dataset, no necesitamos analizar el patrón aleatorio de éstos
+ni cómo imputarlos.
+
+## Análisis descriptivo numérico clásico
+
+Hasta ahora, el resumen de los datos que tenemos es el siguiente.
+
+```{R}
+summary(datos)
+```
+
+Con el siguiente comando crearemos un boxplot para ver cómo es la distribución de las variables.
+
+```{R}
+boxplot (
+  datos,
+  main = "Análisis exploratorio de datos",
+  xlab = "Indicadores",
+  ylab = "Valor",
+  col = c(1 : 15)
+)
+```
+
+Además, para obtener el coeficiente de simetría utilizaremos el comando `skewness`.
+
+https://www.programmingr.com/statistics/skewness/
+
+```{r}
+library(moments)
+skewness(datos)
+```
+
+## Valores extremos
+
+Utilizamos la función [`check_outliers`](https://www.rdocumentation.org/packages/performance/versions/0.8.0/topics/check_outliers) para comprobar si hay outliers:
+
+```{R}
+library("performance")
+check_outliers(datos, method = "mahalanobis")
+```
+
+Aunque en el boxplot anterior sí que se indican posibles valores outliers, utilizando el método de mahalanobis no sale nada. Por tanto, los dejaremos en el conjunto de datos.
+
+## Supuesto de normalidad
+
+Comprobamos si los datos están normalizados (es decir, media 0 y varianza 1).
+Para ello, calculamos la media y la desviación típica de cada variable con
+los siguientes comandos.
+
+```{r}
+round(colMeans(datos), 5)
+```
+
+```{R}
+round(apply(datos, 2, sd), 5)
+```
+
+No lo están, así que los normalizamos:
+
+```{r}
+datos_normalizados <- scale(datos)
+datos_normalizados
+```
+
+Y ahora, podemos comprobar que lo están:
+
+```{r}
+round(colMeans(datos_normalizados), 5)
+```
+
+```{R}
+round(apply(datos_normalizados, 2, sd), 5)
+```
+
+Además, podemos hacer uso del gráfico qqplot para mostrar si hay normalidad:
+
+```{r}
+par(mar = c(1, 1, 1, 1))
+par(mfrow = c(2, 4))
+
+invisible(apply(datos_normalizados, 2, function(x) {
+  qqnorm(x, main = NULL)
+  abline(a = 0, b = 1, col = "#00b894")
+}))
+```
+
+(Comentar esto)
+
+
+# Análisis exploratorio multivariante
+
+```{r}
+datos_pca <- datos_normalizados
+```
+
+## Correlación entre variables (test de Bartlett)
+
+Comprobamos si existe correlación entre las variables usando el test de Bartlett.
+
+```{r}
+library("psych")
+cortest.bartlett(cor(datos_pca), nrow(datos_pca))
+```
+
+Observamos que obtenemos un `p-value` prácticamente nulo, por lo que esto indica que las variables están correladas.
+De esta forma, procederemos a realizar un Análisis de Componentes Principales (ACP).
+
+
+```{r}
+round(cor(datos_pca), 5)
+```
+
+
+## Tratar outliers si no se ha hecho antes
+
+```{R}
+boxplot (
+  datos_pca,
+  main = "Análisis exploratorio de datos",
+  xlab = "Indicadores",
+  ylab = "Valor",
+  col = c(1 : 15)
+)
+```
+
+```{R}
+check_outliers(datos_pca, method = "mahalanobis")
+```
+
+Decidir si los eliminamos finalmente.
+
+```{r}
+outlier <- function(data, na_rm = T) {
+        H <- 1.5 * IQR(data)
+        data[data < quantile(data, 0.25, na.rm = T) - H] <- NA
+        data[data > quantile(data, 0.75, na.rm = T) + H] <- NA
+        data[is.na(data)] <- mean(data, na.rm = T)
+        data
+}
+
+#datos_pca <- apply(datos_pca, 2, outlier)
+```
+
+```{R}
+datos_pca
+```
+
+## Análisis de componentes principales
+
+Realizamos el ACP con la siguiente función.
+
+```{R}
+PCA <- prcomp(datos_pca, scale = T, center = T)
+```
+
+El campo `rotation` del objeto `PCA` es una matriz cuyas columnas son los coeficientes de las componentes principales. Esto es, podemos ver el peso de cada variable en la correspondiente componente principal.
+
+```{R}
+PCA$rotation
+```
+
+Además, con el campo `sdev` del objeto `PCA` y con la función `summary` aplicada al objeto, obtenemos las desviaciones típicas de cada componente principal y la proporción de varianza explicada y acumulada.
+
+```{R}
+PCA$sdev
+summary(PCA)
+```
+
+Con el siguiente comando hacemos un análisis gráfico de la varianza explicada.
+
+```{R}
+library(ggplot2)
+varianza_explicada <- PCA$sdev^2 / sum(PCA$sdev^2)
+ggplot(
+  data = data.frame(varianza_explicada, pc = 1:8),
+  aes(x = pc, y = varianza_explicada, fill = varianza_explicada)
+) + geom_col(width = 0.3) +
+    scale_y_continuous(limits = c(0,0.6)) +
+    theme_minimal() +
+    labs(x = "Componente principal", y= "Proporcion de varianza explicada")
+```
+
+Con el siguiente comando hacemos un análisis gráfico de la varianza explicada.
+
+```{R}
+varianza_acum <- cumsum(varianza_explicada)
+ggplot(
+  data = data.frame(varianza_acum, pc = 1:8),
+  aes(x = pc, y = varianza_acum ,fill=varianza_acum )
+) + geom_col(width = 0.5) +
+    scale_y_continuous(limits = c(0,1)) +
+    theme_minimal() +
+    labs(x = "Componente principal", y = "Proporcion varianza acumulada")
+```
+
+
+## Reducción de dimensión mediante variables observables
+
+En esta sección seleccionaremos el número de componentes principales óptimo.
+
+Para ello, se promedian las varianzas explicadas por las componentes principales y se seleccionan aquellas cuya proporción de varianza explicada supera la media.
+
+Calculamos la varianza con el siguiente comando.
+
+```{R}
+PCA$sdev^2
+```
+
+Calculamos el promedio de la varianza con la siguiente función.
+
+```{R}
+mean(PCA$sdev^2)
+```
+
+Por lo que nos quedaremos con las **tres primeras componentes principales**, pues son las que su proporción de varianza explicada supera la media, que es 1.
+
+Además, para afianzar esta decisión, podemos hacer uso del método del codo, como se indica a continuación.
+
+```{r}
+ggplot(
+  data = data.frame(varianza_acum, pc = 1:8),
+  aes(x = pc, y = varianza_acum)
+) + geom_line(size = 1, colour= "#00b894") +
+    geom_point(size = 2.5, colour = "#2c3e50") +
+    scale_y_continuous(limits = c(0, 1)) +
+    theme_minimal() +
+    labs(x = "Componente principal", y = "Proporcion varianza acumulada")
+```
+
+## Análisis de la normalidad multivariante
+
+El paquete MVN contiene funciones que permiten realizar los tres test que se utilizan habitualmente para contrastar la normalidad multivariante.
+
+Para ello, analizaremos los clusters con la función `mvn`.
+
+Primero, realizamos el test Henze-Zirkler con el siguiente comando.
+
+```{r}
+library(MVN)
+hz_test <- mvn(data = datos_pca, mvnTest = "hz", multivariateOutlierMethod = "quan")
+```
+
+Se detectan 2 outliers en las observaciones 3 y 7. Sin embargo ninguno de los dos test realizados a continuación encuentran evidencias al 5% de significación de falta de normalidad multivariante.
+
+Ahora, realizamos el test de Royston.
+
+```{R}
+royston_test <- mvn(data = datos_pca, mvnTest = "royston", multivariatePlot = "qq")
+```
+
+```{r}
+royston_test$multivariateNormality
+```
+
+```{R}
+hz_test <- mvn(data = datos[,-1], mvnTest = "hz")
+hz_test$multivariateNormality
+```
+
+## Clasificador mediante análisis discriminante
+### Lineal
+### Cuadrático
+## Validación básica; matriz de confusión
