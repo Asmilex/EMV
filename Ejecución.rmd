@@ -1,5 +1,5 @@
 ---
-title: "Análisis exploratorio unidimensional (ejecuciones)"
+title: "Análisis exploratorio (ejecuciones)"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 author:
 - Andrés Millán
@@ -8,6 +8,7 @@ output:
   html_document:
     toc: true
     toc_depth: 3
+    toc_float: true
     number_sections: true
     theme: united
     highlight: tango
@@ -21,15 +22,15 @@ output:
 
 # Análisis exploratorio univariante
 
-Información del dataset:
+Se ha elegido el fichero de datos `DB_2.sav`. La información del dataset es la siguiente:
 
-> Un grupo constituido por 13 empresas se ha clasficiado según las puntuaciones obtenidas en 8 indicadores económicos:
+> Un grupo constituido por 13 empresas se ha clasificado según las puntuaciones obtenidas en 8 indicadores económicos:
 >
 > - X1: Indicador de volumen de facturación.
 > - X2: Indicador de nivel de nueva contratación.
 > - X3: Indicador del total de clientes.
 > - X4: Indicador de beneficios de la empresa .
-> - X5: Indicador de de retribución salarial de los empleados.
+> - X5: Indicador de retribución salarial de los empleados.
 > - X6: Indicador de organización empresarial dentro de la empresa.
 > - X7: Indicador de relaciones con otras empresas.
 > - X8: Indicador de nivel de equipamiento (ordenadores, maquinaria, etc...).
@@ -42,40 +43,33 @@ datos <- read.spss("./datasets/DB_2.sav", to.data.frame = TRUE, reencode = "utf-
 datos
 ```
 
-De hecho, nos dicen que hay 13 empresas, no 14. Esto nos hace sospechar que hay una fila errónea (sus).
+Según el problema, hay 13 empresas pero observamos que hay 14 filas. Esto nos hace sospechar que hay una fila errónea.
+
 
 
 ## Recodificaciones
 
-No es necesario recodificar o agrupar los datos, pues como observamos en el archivo de datos, tenemos que
-todas las variables son numéricas.
+No es necesario recodificar o agrupar los datos, pues como observamos en el archivo de datos, tenemos que todas las variables son numéricas.
 
 
 ## Valores perdidos
 
-Veamos un resumen general de los datos con el siguiente comando.
+Observamos que la variable `x7` tiene un valor perdido, así como la variable `x8`. Por lo que el porcentaje de valores perdidos de las variables `x1`,...,`x6` es del 0%, y de las variables `x7` y `x8` es del 0.071428%.
+
+Veamos los estadísticos descriptivos básicos con el siguiente comando.
 
 ```{R}
 summary(datos)
 ```
 
-Observamos que la variable `x7` tiene un valor perdido, así como la variable `x8`.
-Por lo que el porcentaje de valores perdidos de las variables `x1`,...,`x6` es del 0%,
-y de las variables `x7` y `x8` es del 0.071428%.
-
-Además, nos llama la atención que la media de la variable `x1` obtenga un valor demasiado elevado.
-Esto se debe a que en la fila 14 hay un valor muy grande y hace que se alteren las medidas que resumen
-a las variables. Asimismo, como habíamos mencionado antes, la fila 14 es la que tiene los valores perdidos
-y, como todo indica que las primeras 13 filas corresponden a las 13 primeras empresas,
-procedemos a eliminar esta última fila con el siguiente comando.
+Además, nos llama la atención que la media de la variable `x1` obtenga un valor demasiado elevado. Esto se debe a que en la fila 14 hay un valor muy grande y hace que se alteren las medidas que resumen a las variables. Asimismo, como habíamos mencionado antes, la fila 14 es la que tiene los valores perdidos y, como todo indica que las primeras 13 filas corresponden a las 13 primeras empresas, procedemos a eliminar esta última fila con el siguiente comando.
 
 ```{R}
 datos <- datos[-14, ]
 colSums(is.na(datos))
 ```
 
-Como no tenemos más valores perdidos en el dataset, no necesitamos analizar el patrón aleatorio de éstos
-ni cómo imputarlos.
+Como no tenemos más valores perdidos en el dataset, no necesitamos analizar el patrón aleatorio de éstos ni cómo imputarlos.
 
 ## Análisis descriptivo numérico clásico
 
@@ -119,9 +113,7 @@ Aunque en el boxplot anterior sí que se indican posibles valores outliers, util
 
 ## Supuesto de normalidad
 
-Comprobamos si los datos están normalizados (es decir, media 0 y varianza 1).
-Para ello, calculamos la media y la desviación típica de cada variable con
-los siguientes comandos.
+Comprobamos si los datos están normalizados (es decir, media 0 y varianza 1). Para ello, calculamos la media y la desviación típica de cada variable con los siguientes comandos.
 
 ```{r}
 round(colMeans(datos), 5)
@@ -178,8 +170,7 @@ library("psych")
 cortest.bartlett(cor(datos_pca), nrow(datos_pca))
 ```
 
-Observamos que obtenemos un `p-value` prácticamente nulo, por lo que esto indica que las variables están correladas.
-De esta forma, procederemos a realizar un Análisis de Componentes Principales (ACP).
+Observamos que obtenemos un `p-value` prácticamente nulo, por lo que esto indica que las variables están correladas. De esta forma, procederemos a realizar un Análisis de Componentes Principales (ACP).
 
 
 ```{r}
@@ -270,7 +261,7 @@ ggplot(
 ```
 
 
-## Reducción de dimensión mediante variables observables
+### Reducción de dimensión mediante variables observables
 
 En esta sección seleccionaremos el número de componentes principales óptimo.
 
@@ -296,20 +287,147 @@ Además, para afianzar esta decisión, podemos hacer uso del método del codo, c
 ggplot(
   data = data.frame(varianza_acum, pc = 1:8),
   aes(x = pc, y = varianza_acum)
-) + geom_line(size = 1, colour= "#00b894") +
+) + geom_line(size = 1, colour = "#00b894") +
     geom_point(size = 2.5, colour = "#2c3e50") +
     scale_y_continuous(limits = c(0, 1)) +
     theme_minimal() +
     labs(x = "Componente principal", y = "Proporcion varianza acumulada")
 ```
 
+### Visualización de las contribuciones a las dimensiones principales
+
+En este apartado veremos la representación conjunta de variables y observaciones que relaciona visualmente las posibles relaciones entre las observaciones, las contribuciones de los individuos a las varianzas de las componentes y el peso de las variables en cada componentes principal.
+
+Variables y observaciones en la primera y segunda componente principal:
+
+```{r}
+library("factoextra")
+fviz_pca(
+  PCA,
+  axes = c(1, 2),
+  alpha.ind = "contrib",
+  col.var = "cos2", col.ind = "#2c3e50",
+  gradient.cols = c("#ddd839", "#f7a438", "#e9473b"),
+  repel = TRUE,
+  legend.title = "Distancia"
+) + theme_bw()
+
+```
+
+Variables y observaciones en la primera y tercera componente principal:
+
+```{r}
+fviz_pca(
+  PCA,
+  axes = c(1, 3),
+  alpha.ind = "contrib",
+  col.var = "cos2",
+  col.ind = "#2c3e50",
+  gradient.cols = c("#ddd839", "#f7a438", "#e9473b"),
+  repel = TRUE,
+  legend.title = "Distancia"
+) + theme_bw()
+```
+
+Variables y observaciones en la segunda y tercera componente principal:
+
+```{R}
+fviz_pca(
+  PCA,
+  axes = c(2, 3),
+  alpha.ind = "contrib",
+  col.var = "cos2",
+  col.ind = "#2c3e50",
+  gradient.cols = c("#ddd839", "#f7a438", "#e9473b"),
+  repel = TRUE,
+  legend.title = "Distancia"
+  ) + theme_bw()
+```
+
+
+## Análisis factorial (variables latentes)
+
+Ya hemos visto que las variables están correladas, luego tiene sentido el AF.
+
+Obtenemos una representación visual de las correlaciones. Calculamos la matriz de correlaciones policórica.
+
+```{R}
+library("polycor")
+library("ggcorrplot")
+datos_af <- datos_normalizados
+poly_cor <- hetcor(datos_af)$correlations
+ggcorrplot(poly_cor, type = "lower", hc.order = T)
+```
+
+Ahora, compararemos las salidas con el método del factor principal y con el de máxima verosimilitud.
+
+```{R}
+modelo1 <- fa(
+  poly_cor,
+  nfactors = 3,
+  rotate = "none",
+  fm = "mle"
+) # modelo máxima verosimilitud
+```
+
+```{R}
+modelo2 <- fa(
+  poly_cor,
+  nfactors = 3,
+  rotate = "none",
+  fm = "minres"
+) # modelo mínimo residuo
+```
+
+Comparamos las comunalidades.
+
+```{R}
+sort(modelo1$communality,decreasing = T) -> c1
+sort(modelo2$communality,decreasing = T) -> c2
+head(cbind(c1,c2))
+```
+
+Comparamos las unicidades, es decir, la proporción de varianza que no ha sido explicada por el factor (1-comunalidad).
+
+```{R}
+sort(modelo1$uniquenesses, decreasing = T) -> u1
+sort(modelo2$uniquenesses, decreasing = T) -> u2
+head(cbind(u1,u2))
+```
+
+Determinamos el número óptimo de factores.
+
+```{R}
+scree(poly_cor)
+fa.parallel(poly_cor, n.obs = 13, fa = "fa", fm = "mle")
+```
+
+Estimamos el modelo factorial con 3 factores implementando una rotación tipo varimax para buscar una interpretación más simple.
+
+```{R}
+modelo_varimax <- fa(poly_cor, nfactors = 3, rotate = "varimax", fa = "mle")
+```
+
+Mostramos la matriz de pesos factorial rotada.
+
+```{R}
+print(modelo_varimax$loadings, cut = 0)
+fa.diagram(modelo_varimax)
+```
+
+En este diagrama, el primer factor está asociado con los items `x6`, `x7` y `x8`. El segundo factor está asociado con los items `x1`, `x2` y `x3`. El tercer factor está asociado con los items `x4` y `x5`.
+
+Veamos con el test de hipótesis que contrasta si el número de factores es suficiente.
+
+```{R}
+library(stats)
+factanal(datos_af, factors = 3, rotation="none")
+```
+
+
 ## Análisis de la normalidad multivariante
 
-El paquete MVN contiene funciones que permiten realizar los tres test que se utilizan habitualmente para contrastar la normalidad multivariante.
-
-Para ello, analizaremos los clusters con la función `mvn`.
-
-Primero, realizamos el test Henze-Zirkler con el siguiente comando.
+El paquete MVN contiene funciones que permiten realizar los test que se utilizan habitualmente para contrastar la normalidad multivariante. Además, podemos analizar los outliers con funciones de este paquete.
 
 ```{r}
 library(MVN)
@@ -318,7 +436,7 @@ hz_test <- mvn(data = datos_pca, mvnTest = "hz", multivariateOutlierMethod = "qu
 
 Se detectan 2 outliers en las observaciones 3 y 7. Sin embargo ninguno de los dos test realizados a continuación encuentran evidencias al 5% de significación de falta de normalidad multivariante.
 
-Ahora, realizamos el test de Royston.
+A continuación realizamos el test de Royston.
 
 ```{R}
 royston_test <- mvn(data = datos_pca, mvnTest = "royston", multivariatePlot = "qq")
@@ -328,12 +446,22 @@ royston_test <- mvn(data = datos_pca, mvnTest = "royston", multivariatePlot = "q
 royston_test$multivariateNormality
 ```
 
+El test de Henze-Zirkler es el siguiente.
+
 ```{R}
-hz_test <- mvn(data = datos[,-1], mvnTest = "hz")
+hz_test <- mvn(data = datos[, -1], mvnTest = "hz")
 hz_test$multivariateNormality
 ```
+
+Ambos nos dicen que siguen una normal multivariante.
 
 ## Clasificador mediante análisis discriminante
 ### Lineal
 ### Cuadrático
+
+
 ## Validación básica; matriz de confusión
+
+```{R, purl=FALSE}
+knitr::purl("./Ejecución.rmd")
+```

@@ -1,9 +1,9 @@
 ---
-title: "Análisis exploratorio unidimensional (ejecuciones)"
+title: "Análisis exploratorio"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 author:
-- Andrés Millán
-- Paula Villanueva
+- "Andrés Millán"
+- "Paula Villanueva"
 output:
   html_document:
     toc: true
@@ -20,14 +20,96 @@ output:
     highlight: tango
 ---
 
+```{R, echo=FALSE, results=FALSE, message=FALSE, fig.show='hide', warning=FALSE}
+source('./Ejecución.R')
+```
+
 # Abstract
+
+En esta práctica se ha realizado el análisis exploratorio sobre un cierto conjunto de datos. Este dataset recoge 8 indicadores económicos de 13 empresas. Tras estudiar la información recogida en el conjunto, tratando posibles valores perdidos y outliers, se han aplicado dos tipos de técnicas:
+
+- **Análisis univariante numérico y gráfico**. En él, se ha realizado un análisis descriptivo numérico clásico y un análisis de supuesto de normalidad.
+- **Técnicas multivariantes**: se ha estudiado la correlación entre variables, la reducción de la dimensión mediante variables observables y latentes. Además, se ha estudiado la normalidad multivariante de los datos.
+
+Finalmente, se ha construido un clasificador mediante un análisis discriminante lineal y otro cuadrático, comprobando cómo de eficaz resulta aplicarlo.
+
 
 # Introducción
 
+Se ha realizado el análisis exploratorio de los datos contenidos en la base de datos `DB_2`. Esta base de datos contiene un grupo constituido por 13 empresas que se ha clasificado según las puntuaciones obtenidas en 8 indicadores económicos.
+
+Primero, se ha limpiado el dataset de cualquier anomalía posible. Hemos encontrado una instancia probablemente errónea, que contenía valores perdidos e indicadores sin ningún sentido. A continuación, se ha estudiado posibles outliers, llegando a la conclusión de que no lo eran.
+
+Se ha comprobado también la normalidad de las variables individualmente, llegándose a la conclusión de que, excepto x6, x8, todas siguen esta distribución.
+
+
+(¿Esto de aquí abajo sobra?)
+
+```{R}
+boxplot (
+  datos_pca,
+  main = "Análisis exploratorio de datos",
+  xlab = "Indicadores",
+  ylab = "Valor",
+  col = c(1 : 15)
+)
+```
+
+Una vez preparado el conjunto inicial, se comprobó que era factible aplicar nuestras técnicas de análisis mediante un test de Bartlett, obteniéndose un p-valor de
+
+```{R}
+cortest.bartlett(cor(datos_pca), nrow(datos_pca))$p.value
+```
+
+
+
 # Materiales y métodos
+
+## Materiales
+
+- Hablar dataset
+- Estadísticos descriptivos básicos
+- Boxplots
+- Hablar sobre los posibles outliers, que decidimos no quitarlos.
+
+La base de datos elegida contiene un grupo constituido por 13 empresas que se ha clasificado según las puntuaciones obtenidas en 8 indicadores económicos:
+
+- X1: Indicador de volumen de facturación.
+- X2: Indicador de nivel de nueva contratación.
+- X3: Indicador del total de clientes.
+- X4: Indicador de beneficios de la empresa .
+- X5: Indicador de retribución salarial de los empleados.
+- X6: Indicador de organización empresarial dentro de la empresa.
+- X7: Indicador de relaciones con otras empresas.
+- X8: Indicador de nivel de equipamiento (ordenadores, maquinaria, etc...).
+
+A continuación se muestra una tabla con los estadísticos descriptivos básicos.
+
+```{r}
+summary(datos)
+```
+```{R}
+sapply(datos, sd)
+```
+
+## Métodos estadísticos
+
+- Indicar técnicas usadas.
+
+
+En este apartado se indican las distintas técnicas estadísticas que se han utilizado. Primero, se ha realizado un análisis numérico y gráfico de cada variable. De esta forma, mediante en visionado de la estructura del archivo de datos, no se han detectado recodificaciones. Sin embargo, sí que se han detectado valores perdidos en una variable. También se ha realizado un análisis descriptivo numérico clásico, esto es, usando las funciones `summary`, `boxplot` y `skewness` hemos obtenido las medidas de tendencia central, dispersión, cuartiles, simetría, etc.
+
 
 # Resultados
 
+- Resumen de lo más destacado
+- Probablemente debamos usar bastantes gráficas.
+- Exposición objetiva.
+
 # Discusión
+
+- Recordar objetivo
+- Interpretación de los resultados
+- Discutir cómo se han conseguido esos resultados
 
 # Conclusiones
