@@ -280,3 +280,57 @@ royston_test$multivariateNormality
 hz_test <- mvn(data = datos[, -1], mvnTest = "hz")
 hz_test$multivariateNormality
 
+
+## -----------------------------------------------------------------------------
+# install.packages("tidyverse")
+# install.packages("cluster")
+# install.packages("factoextra")
+
+# Cargamos los paquetes indicados
+library(tidyverse)
+library(cluster)
+library(factoextra)
+
+
+## -----------------------------------------------------------------------------
+distancias <- get_dist(datos_normalizados)
+
+fviz_dist(
+  distancias,
+  gradient = list(low = "#00AFBB", mid = "white", high = "#FC4E07")
+)
+
+
+## -----------------------------------------------------------------------------
+k2 <- kmeans(datos_normalizados, centers = 2, nstart = 25)
+k3 <- kmeans(datos_normalizados, centers = 3, nstart = 25)
+k4 <- kmeans(datos_normalizados, centers = 4, nstart = 25)
+k5 <- kmeans(datos_normalizados, centers = 5, nstart = 25)
+
+# plots to compare
+p1 <- fviz_cluster(k2, geom = "point", data = datos_normalizados) + ggtitle("k = 2")
+p2 <- fviz_cluster(k3, geom = "point", data = datos_normalizados) + ggtitle("k = 3")
+p3 <- fviz_cluster(k4, geom = "point", data = datos_normalizados) + ggtitle("k = 4")
+p4 <- fviz_cluster(k5, geom = "point", data = datos_normalizados) + ggtitle("k = 5")
+
+
+library(gridExtra)
+grid.arrange(p1, p2, p3, p4, nrow = 2)
+
+
+## -----------------------------------------------------------------------------
+fviz_nbclust(datos_normalizados, kmeans, method = "wss")
+
+
+## -----------------------------------------------------------------------------
+fviz_nbclust(datos_normalizados, kmeans, method = "silhouette")
+
+
+## -----------------------------------------------------------------------------
+gap_stat <- clusGap(datos_normalizados, FUN = kmeans, nstart = 25, K.max = 10, B = 50)
+fviz_gap_stat(gap_stat)
+
+
+## -----------------------------------------------------------------------------
+print(k4)
+
