@@ -83,20 +83,20 @@ A continuación se muestra una tabla con los estadísticos descriptivos básicos
 
 
 ```
-##        x1               x2                x3               x4                x5               x6        
-##  Min.   : 0.128   Min.   : 0.9444   Min.   : 2.167   Min.   : 0.0299   Min.   : 2.557   Min.   : 6.135  
-##  1st Qu.: 2.476   1st Qu.: 8.6931   1st Qu.: 8.667   1st Qu.: 4.0673   1st Qu.: 3.525   1st Qu.:10.170  
-##  Median : 7.584   Median :14.8487   Median :15.167   Median : 5.4044   Median : 5.336   Median :11.374  
-##  Mean   : 6.957   Mean   :14.9138   Mean   :15.167   Mean   : 5.3976   Mean   : 5.107   Mean   :21.006  
-##  3rd Qu.:10.734   3rd Qu.:21.7262   3rd Qu.:21.667   3rd Qu.: 6.5147   3rd Qu.: 5.874   3rd Qu.:31.586  
-##  Max.   :14.364   Max.   :25.4261   Max.   :28.167   Max.   :11.3959   Max.   :10.037   Max.   :43.278  
-##        x7               x8        
-##  Min.   : 1.064   Min.   : 3.949  
-##  1st Qu.: 3.982   1st Qu.: 6.833  
-##  Median : 5.584   Median : 8.103  
-##  Mean   : 6.598   Mean   :13.074  
-##  3rd Qu.:10.160   3rd Qu.:20.154  
-##  Max.   :12.374   Max.   :26.571
+##        x1               x2                x3               x4         
+##  Min.   : 0.128   Min.   : 0.9444   Min.   : 2.167   Min.   : 0.0299  
+##  1st Qu.: 2.476   1st Qu.: 8.6931   1st Qu.: 8.667   1st Qu.: 4.0673  
+##  Median : 7.584   Median :14.8487   Median :15.167   Median : 5.4044  
+##  Mean   : 6.957   Mean   :14.9138   Mean   :15.167   Mean   : 5.3976  
+##  3rd Qu.:10.734   3rd Qu.:21.7262   3rd Qu.:21.667   3rd Qu.: 6.5147  
+##  Max.   :14.364   Max.   :25.4261   Max.   :28.167   Max.   :11.3959  
+##        x5               x6               x7               x8        
+##  Min.   : 2.557   Min.   : 6.135   Min.   : 1.064   Min.   : 3.949  
+##  1st Qu.: 3.525   1st Qu.:10.170   1st Qu.: 3.982   1st Qu.: 6.833  
+##  Median : 5.336   Median :11.374   Median : 5.584   Median : 8.103  
+##  Mean   : 5.107   Mean   :21.006   Mean   : 6.598   Mean   :13.074  
+##  3rd Qu.: 5.874   3rd Qu.:31.586   3rd Qu.:10.160   3rd Qu.:20.154  
+##  Max.   :10.037   Max.   :43.278   Max.   :12.374   Max.   :26.571
 ```
 
 
@@ -145,8 +145,10 @@ skewness(datos)
 ```
 
 ```
-##            x1            x2            x3            x4            x5            x6            x7            x8 
-## -6.571128e-02 -2.178143e-01  2.441493e-16  8.611432e-02  9.539367e-01  4.214678e-01  1.014152e-01  4.874442e-01
+##            x1            x2            x3            x4            x5            x6 
+## -6.571128e-02 -2.178143e-01  2.441493e-16  8.611432e-02  9.539367e-01  4.214678e-01 
+##            x7            x8 
+##  1.014152e-01  4.874442e-01
 ```
 
 Antes de proceder con el PCA y el AF, es necesario tratar los outliers. Este fue un punto de discusión importante, pues como vimos en la figura 1, se muestran tres outliers en las variables x4, x5. Sin embargo, utilizando el método de Mahalanobis, encontramos que no se detecta ninguno:
@@ -243,7 +245,10 @@ p3
 
 Este modelo nos arroja las siguientes siluetas:
 
-![Siluetas de K-Means, k = 4](figure/unnamed-chunk-20-1.png)
+
+```
+## Error in plot(silueta): object 'silueta' not found
+```
 
 # Discusión y conclusiones
 
