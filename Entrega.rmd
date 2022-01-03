@@ -42,6 +42,7 @@ output:
 
 ```{R, purl=FALSE, echo=FALSE, results=FALSE, message=FALSE, fig.show='hide', warning=FALSE}
 # Carga un archivo .R con las variables del otro documento.
+knitr::purl('./Ejecución.rmd')
 source('./Ejecución.R')
 ```
 

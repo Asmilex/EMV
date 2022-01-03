@@ -245,10 +245,7 @@ p3
 
 Este modelo nos arroja las siguientes siluetas:
 
-
-```
-## Error in plot(silueta): object 'silueta' not found
-```
+![Siluetas de K-Means, k = 4](figure/unnamed-chunk-20-1.png)
 
 # Discusión y conclusiones
 
