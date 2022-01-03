@@ -1,9 +1,29 @@
 ---
 title: "Análisis exploratorio"
-date: "03 enero, 2022"
+date: "03 de enero de 2022"
 author:
 - "Andrés Millán"
 - "Paula Villanueva"
+
+documentclass: scrreprt
+geometry:
+- top=1.5in
+- bottom=1in
+- right=1in
+- left=1in
+
+numbersections: true
+
+mainfont: 'Crimson Pro'
+fontsize: 12pt
+monofont: 'JuliaMono'
+monofontoptions:
+ - Scale=0.6
+header-includes:
+ - \usepackage{fvextra}
+ - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+urlcolor: blue
+
 output:
   html_document:
     toc: true
@@ -17,9 +37,9 @@ output:
     toc: true
     toc_depth: 3
     number_sections: true
-    theme: united
     highlight: tango
 ---
+
 
 
 
@@ -30,7 +50,7 @@ Se ha realizado un análisis exploratorio de un conjunto de datos. Este dataset 
 - **Análisis univariante numérico y gráfico**. En él, se ha elaborado un análisis descriptivo numérico clásico y un análisis de supuesto de normalidad.
 - **Técnicas multivariantes**: se ha estudiado la correlación entre variables, la reducción de la dimensión mediante variables observables y latentes. Además, se ha estudiado la normalidad multivariante de los datos.
 
-Finalmente, se ha construido un clasificador basado en clustering no jerárquico con el fin de estudiar cómo se agrupan las diferentes empresas. Descubrimos que (...terminar con lo que hemos encontrado...)
+Finalmente, se ha construido un clasificador basado en clustering no jerárquico con el fin de estudiar cómo se agrupan las diferentes empresas. Descubrimos que existen 4 grupos diferentes.
 
 
 # Introducción
@@ -48,10 +68,6 @@ Finalmente, para completar nuestro objetivo, se ha realizado un análisis cluste
 
 ## Materiales
 
-- Hablar dataset
-- Estadísticos descriptivos básicos
-- Boxplots
-
 La base de datos elegida contiene un grupo constituido por 13 empresas que se ha clasificado según las puntuaciones obtenidas en 8 indicadores económicos:
 
 - X1: Indicador de volumen de facturación.
@@ -67,20 +83,26 @@ A continuación se muestra una tabla con los estadísticos descriptivos básicos
 
 
 ```
-##        x1               x2                x3               x4         
-##  Min.   : 0.128   Min.   : 0.9444   Min.   : 2.167   Min.   : 0.0299  
-##  1st Qu.: 2.476   1st Qu.: 8.6931   1st Qu.: 8.667   1st Qu.: 4.0673  
-##  Median : 7.584   Median :14.8487   Median :15.167   Median : 5.4044  
-##  Mean   : 6.957   Mean   :14.9138   Mean   :15.167   Mean   : 5.3976  
-##  3rd Qu.:10.734   3rd Qu.:21.7262   3rd Qu.:21.667   3rd Qu.: 6.5147  
-##  Max.   :14.364   Max.   :25.4261   Max.   :28.167   Max.   :11.3959  
-##        x5               x6               x7               x8        
-##  Min.   : 2.557   Min.   : 6.135   Min.   : 1.064   Min.   : 3.949  
-##  1st Qu.: 3.525   1st Qu.:10.170   1st Qu.: 3.982   1st Qu.: 6.833  
-##  Median : 5.336   Median :11.374   Median : 5.584   Median : 8.103  
-##  Mean   : 5.107   Mean   :21.006   Mean   : 6.598   Mean   :13.074  
-##  3rd Qu.: 5.874   3rd Qu.:31.586   3rd Qu.:10.160   3rd Qu.:20.154  
-##  Max.   :10.037   Max.   :43.278   Max.   :12.374   Max.   :26.571
+##        x1               x2                x3               x4                x5               x6        
+##  Min.   : 0.128   Min.   : 0.9444   Min.   : 2.167   Min.   : 0.0299   Min.   : 2.557   Min.   : 6.135  
+##  1st Qu.: 2.476   1st Qu.: 8.6931   1st Qu.: 8.667   1st Qu.: 4.0673   1st Qu.: 3.525   1st Qu.:10.170  
+##  Median : 7.584   Median :14.8487   Median :15.167   Median : 5.4044   Median : 5.336   Median :11.374  
+##  Mean   : 6.957   Mean   :14.9138   Mean   :15.167   Mean   : 5.3976   Mean   : 5.107   Mean   :21.006  
+##  3rd Qu.:10.734   3rd Qu.:21.7262   3rd Qu.:21.667   3rd Qu.: 6.5147   3rd Qu.: 5.874   3rd Qu.:31.586  
+##  Max.   :14.364   Max.   :25.4261   Max.   :28.167   Max.   :11.3959   Max.   :10.037   Max.   :43.278  
+##        x7               x8        
+##  Min.   : 1.064   Min.   : 3.949  
+##  1st Qu.: 3.982   1st Qu.: 6.833  
+##  Median : 5.584   Median : 8.103  
+##  Mean   : 6.598   Mean   :13.074  
+##  3rd Qu.:10.160   3rd Qu.:20.154  
+##  Max.   :12.374   Max.   :26.571
+```
+
+
+
+```
+## [1] "Desviaciones estándar:"
 ```
 
 ```
@@ -90,7 +112,7 @@ A continuación se muestra una tabla con los estadísticos descriptivos básicos
 
 En la siguiente gráfica se muestran los diagramas de cajas de las variables.
 
-<img src="C:/Users/Andre/.vscode-R/tmp/b1c11fa47eb9e671bc734451f395548a2b0d126319f5a70a0a55b3a9d77ce101_files/figure-html/unnamed-chunk-114-1.png" width="672" />
+![Diagrama de cajas](figure/fig.-1.png)
 
 
 ## Métodos estadísticos
@@ -111,121 +133,26 @@ Finalmente, para realizar el agrupamiento de los objetos, se ha utilizado la té
 
 # Resultados
 
-- Resumen de lo más destacado
-- Probablemente debamos usar bastantes gráficas.
-- Exposición objetiva.
-- Hablar sobre los posibles outliers, que decidimos no quitarlos.
-
-
-En este apartado se mostrarán los resultados obtenidos tras aplicar las técnicas mencionadas anteriormente.
+En este apartado se mostrarán los resultados obtenidos aplicando las técnicas mencionadas anteriormente.
 
 ## Análisis exploratorio univariante
 
-### Valores perdidos
-
-Mediante la carga y visionado de datos podemos detectar los posibles valores perdidos.
-
-
-```
-## re-encoding from utf-8
-```
-
-```
-##              x1         x2        x3          x4        x5        x6        x7
-## 1  1.279554e-01  0.9444263  2.166667  5.79433292  5.480291 11.096322  3.982094
-## 2  1.552544e+00  4.2996830  4.333333  5.40439487  5.335612 11.011499  5.584143
-## 3  1.214796e+00  6.8997865  6.500000  4.06727850  6.889363 24.763075  7.276582
-## 4  2.475883e+00  8.6930622  8.666667  7.40941778  4.137916 31.585770 10.339785
-## 5  6.013061e+00 11.2399245 10.833333  0.02990288 10.036760 10.169836  1.966363
-## 6  6.735028e+00 13.1271733 13.000000  1.54954845  5.874234  6.134638  1.063619
-## 7  7.583921e+00 14.8487119 15.166667 11.39590764  2.709851  6.955054  1.667021
-## 8  8.014212e+00 18.1598131 17.333333  6.32676834  2.556536 41.523867 12.373881
-## 9  8.119725e+00 19.5660634 19.500000  6.51471573  3.462434 31.037808 10.160371
-## 10 1.151672e+01 21.7261519 21.666667  5.06008196  5.918977 43.278324 12.235597
-## 11 1.073365e+01 24.1410834 23.833333  3.96939242  5.595512 11.374130  5.236333
-## 12 1.198526e+01 24.8071237 26.000000  4.88552952  4.870252  9.709267  4.088848
-## 13 1.436357e+01 25.4261297 28.166667  7.76111352  3.524603 34.436416  9.798433
-## 14 2.002300e+04 18.0000000 16.000000  8.00000000  8.000000 10.000000        NA
-##           x8
-## 1   5.798710
-## 2   8.102565
-## 3  14.398706
-## 4  17.872456
-## 5   7.550620
-## 6   3.948938
-## 7   4.750391
-## 8  26.231918
-## 9  20.154125
-## 10 26.571424
-## 11  7.333438
-## 12  6.832688
-## 13 20.413416
-## 14        NA
-```
-
-### Análisis descriptivo numérico clásico
-
-A continuación se muestran los estadísticos descriptivos básicos.
+Para estudiar nuestro conjunto de datos, podemos obtener el coeficiente de simetría de la distribución estadística.
 
 
 ```r
-summary(datos)
-```
-
-```
-##        x1               x2                x3               x4         
-##  Min.   : 0.128   Min.   : 0.9444   Min.   : 2.167   Min.   : 0.0299  
-##  1st Qu.: 2.476   1st Qu.: 8.6931   1st Qu.: 8.667   1st Qu.: 4.0673  
-##  Median : 7.584   Median :14.8487   Median :15.167   Median : 5.4044  
-##  Mean   : 6.957   Mean   :14.9138   Mean   :15.167   Mean   : 5.3976  
-##  3rd Qu.:10.734   3rd Qu.:21.7262   3rd Qu.:21.667   3rd Qu.: 6.5147  
-##  Max.   :14.364   Max.   :25.4261   Max.   :28.167   Max.   :11.3959  
-##        x5               x6               x7               x8        
-##  Min.   : 2.557   Min.   : 6.135   Min.   : 1.064   Min.   : 3.949  
-##  1st Qu.: 3.525   1st Qu.:10.170   1st Qu.: 3.982   1st Qu.: 6.833  
-##  Median : 5.336   Median :11.374   Median : 5.584   Median : 8.103  
-##  Mean   : 5.107   Mean   :21.006   Mean   : 6.598   Mean   :13.074  
-##  3rd Qu.: 5.874   3rd Qu.:31.586   3rd Qu.:10.160   3rd Qu.:20.154  
-##  Max.   :10.037   Max.   :43.278   Max.   :12.374   Max.   :26.571
-```
-
-Para ver cómo es la distribución de las variables, representaremos el diagrama de cajas.
-
-
-```r
-boxplot (
-  datos,
-  main = "Análisis exploratorio de datos",
-  xlab = "Indicadores",
-  ylab = "Valor",
-  col = c(1 : 15)
-)
-```
-
-<img src="C:/Users/Andre/.vscode-R/tmp/b1c11fa47eb9e671bc734451f395548a2b0d126319f5a70a0a55b3a9d77ce101_files/figure-html/unnamed-chunk-117-1.png" width="672" />
-
-Además, tambien se ha obtenido el coeficiente de simetría.
-
-
-```r
-library(moments)
 skewness(datos)
 ```
 
 ```
-##            x1            x2            x3            x4            x5 
-## -6.571128e-02 -2.178143e-01  2.441493e-16  8.611432e-02  9.539367e-01 
-##            x6            x7            x8 
-##  4.214678e-01  1.014152e-01  4.874442e-01
+##            x1            x2            x3            x4            x5            x6            x7            x8 
+## -6.571128e-02 -2.178143e-01  2.441493e-16  8.611432e-02  9.539367e-01  4.214678e-01  1.014152e-01  4.874442e-01
 ```
 
-### Valores extremos
-
-Se ha comprobado si hay outliers.
+Antes de proceder con el PCA y el AF, es necesario tratar los outliers. Este fue un punto de discusión importante, pues como vimos en la figura 1, se muestran tres outliers en las variables x4, x5. Sin embargo, utilizando el método de Mahalanobis, encontramos que no se detecta ninguno:
 
 
 ```r
-library("performance")
 check_outliers(datos, method = "mahalanobis")
 ```
 
@@ -233,34 +160,141 @@ check_outliers(datos, method = "mahalanobis")
 ## OK: No outliers detected.
 ```
 
-### Supuesto de normalidad
+Tras normalizar el conjunto de datos, estudiamos cómo se distribuían las variables, produciendo el siguiente resultado:
 
-Se ha comprobado si los datos están normalizados (es decir, media 0 y varianza 1). Para ello, calculamos la media y la desviación típica de cada variable.
+![Aproximación a normales univariantes](figure/unnamed-chunk-6-1.png)
+
+## Análisis explotatorio multivariante
+
+### Análisis de componentes principales
+
+Se ha comprobado que existe correlación entre las variables usando el test de Bartlett, pues obteníamos un `p-valor` prácticamente nulo. Esto indica que las variables están correladas, luego procederemos a realizar un Análisis de Componentes Principales (ACP).
+
+Se han obtenido las desviaciones típicas de cada componente principal y la proporción de varianza explicada y acumulada. Podemos observar en la siguiente imagen un análisis gráfico de la varianza explicada.
+
+![Análisis gráfico de la varianza explicada](figure/unnamed-chunk-7-1.png)
+
+De la misma forma, obtenemos un análisis gráfico de la varianza acumulada.
+
+![Análisis gráfico de varianza acumulada](figure/unnamed-chunk-8-1.png)
+
+A continuación, se seleccionaron el número de componentes principales óptimo para reducir la dimensión mediante variables observables. Mediante el método del codo, se ha podido analizar gráficamente y elegir las componentes principales.
+
+![Método del codo](figure/unnamed-chunk-9-1.png)
+
+En las siguientes gráficas podremos observar la representación conjunta de variables y observaciones que relaciona visualmente las posibles relaciones entre las observaciones, las contribuciones de los individuos a las varianzas de las componentes y el peso de las variables en cada componentes principal.
+
+Variables y observaciones en la primera y segunda componente principal:
+
+![Contribuciones para la primera y segunda componente](figure/unnamed-chunk-10-1.png)
+
+Variables y observaciones en la primera y tercera componente principal:
+
+![Contribuciones para la primera y tercera componente](figure/unnamed-chunk-11-1.png)
+
+Variables y observaciones en la segunda y tercera componente principal:
+
+![Contribuciones para la segunda y tercera componente](figure/unnamed-chunk-12-1.png)
+
+### Análisis factorial
+
+Tras realizar el ACP, procedemos a realizar el Análisis Factorial (AF), el cual tiene sentido porque las variables están correladas:
+
+![Correlaciones](figure/unnamed-chunk-13-1.png)
+
+Una vez comparadas las salidas con el método del factor principal y con el de máxima verosimilitud, comparamos las comunalidades y las unicidades. De esta forma, ya podemos determinar el número óptimo de factores basándonos en los siguientes gráficos.
+
+![Scree plot](figure/unnamed-chunk-14-1.png)
+
+![Análisis paralelo de scree plots](figure/unnamed-chunk-15-1.png)
+
+```
+## Parallel analysis suggests that the number of factors =  2  and the number of components =  NA
+```
+
+Estimamos el modelo factorial con 3 factores implementando una rotación tipo varimax para buscar una interpretación más simple.
+
+![Contribuciones](figure/unnamed-chunk-16-1.png)
+
+Finalmente, con el test de hipótesis contrastamos si el número de factores es suficiente, lo cual fue cierto.
+
+### Análisis de la normalidad multivariante
+
+Previo al análisis cluster, se ha analizado la normalidad multivariante de los datos con los tests de Royston y de Henze-Zirkler. Sin embargo ninguno de los dos tests encuentran evidencias al 5% de significación de falta de normalidad multivariante.
+
+Tras realizar el test de Royston, obtenemos la gráfica que se muestra a continuación.
+
+![Test de Royston](figure/unnamed-chunk-17-1.png)
+
+## Clasificación
+
+Para finalizar, se han aplicado técnicas de clustering. Hemos llegado a la conclusión de que el número óptimo de clusters para este dataset es 4:
+
+![Número óptimo de clusters](figure/unnamed-chunk-18-1.png)
+
+K-Means produce las siguientes particiones:
 
 
 ```r
-round(colMeans(datos), 5)
+p3
+```
+
+![Clusters](figure/unnamed-chunk-19-1.png)
+
+Este modelo nos arroja las siguientes siluetas:
+
+![Siluetas de K-Means, k = 4](figure/unnamed-chunk-20-1.png)
+
+# Discusión y conclusiones
+
+El objetivo principal consistía en realizar un agrupamiento de los objetos formando clusters de objetos con un alto grado de homogeneidad interna y heterogeneidad entre clusters.
+
+En primer lugar, se ha obtenido el coeficiente de simetría de cada variable en la sección [4.1](#Análisis exploratorio univariante). En este problema, hemos obtenido valores positivos o negativos. Un valor negativo significa que la distribución está sesgada a la derecha, mientras que un valor positivo indica que la distribución se encuentra sesgada hacia la izquierda.
+
+Uno de los puntos más controvertidos de este trabajo es la decisión de eliminar outliers. Como podemos observar en el diagrama de cajas de la sección  [3.1](#Materiales), se muestran tres outliers en las variables `x4` y `x5`. Sin embargo, se ha tomado la decisión de no eliminarlos, pues si no fuera así, se ha comprobado que las métricas de rendimiento bajaban.
+
+Por otra parte, hemos observado que algunas de nuestras variables no se distribuyen con respecto a una normal. Esto queda evidenciado por la gráfica de la sección [4.1](#Análisis exploratorio univariante). En concreto, las variables x6 y x8 dan problemas. Realizando un test de shapiro para estas variables, se obtiene lo siguiente:
+
+
+```
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  datos_normalizados[, "x6"]
+## W = 0.84811, p-value = 0.02694
 ```
 
 ```
-##       x1       x2       x3       x4       x5       x6       x7       x8 
-##  6.95664 14.91378 15.16667  5.39757  5.10710 21.00585  6.59793 13.07380
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  datos_normalizados[, "x8"]
+## W = 0.86598, p-value = 0.04623
 ```
 
+Ambos obtienen un p-valor por debajo de 0.05. Es probable que supongan una fuente de imprecisiones a la hora de pasar a la distribución normal multivariante.
 
-```r
-round(apply(datos, 2, sd), 5)
-```
+En cuanto al Análisis Factorial de la sección [4.2.2](#Análisis factorial), se ha tomado la decisión de estimar 3 factores apoyándose en las gráficas obtenidas. Sin embargo, el análisis paralelo sugería que se estimasen 2 factores, lo cual produciría [un caso de ultra-Heywood](https://v8doc.sas.com/sashtml/stat/chap26/sect21.htm).
 
-```
-##       x1       x2       x3       x4       x5       x6       x7       x8 
-##  4.54510  8.16260  8.43795  2.82382  1.99191 13.77978  4.03066  8.24973
-```
 
-# Discusión
+\begin{figure}
+\includegraphics[width=0.8\textwidth, height=!]{./img/xkcd.png}
+\centering
+\caption{\textit{Dos es poco, tres es mucho. Fuente: https://xkcd.com/2560/}}
+\end{figure}
 
-- Recordar objetivo
-- Interpretación de los resultados
-- Discutir cómo se han conseguido esos resultados
 
-# Conclusiones
+Finalmente, hay otro matiz muy importante que debemos discutir. **Nuestro dataset solo tiene 13 instancias**. Hacer un análisis de calidad con tan pocos datos no es posible. En general, clustering necesita decenas de instancias como mínimo para producir resultados realistas.
+
+Para ejemplificar esto, la gráfica de las siluetas. Se genera una silueta de 0.37, la cual es considerablemente baja. Mirando los clusters, podemos ver cómo en el cluster 2 existen 2 elementos, mientras que en el 3 hay 3. Con esto no podemos llegar a ninguna conclusión.
+
+Con el fin de encontrar agrupaciones pertinentes y producir un análisis de calidad, sería necesario ampliar el número de empresas. De esta forma, se podrían observar patrones más relevantes.
+
+
+# Distribución de las tareas entre las personas implicadas
+
+Para realizar este trabajo, no se han distribuido las tareas, sino que ambos hemos hecho todas las tareas a la vez, supervisando el uno al otro y poniendo en común nuestro conocimiento.
+
+
+
+

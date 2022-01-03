@@ -1,9 +1,29 @@
 ---
 title: "Análisis exploratorio"
-date: "`r format(Sys.time(), '%d %B, %Y')`"
+date: "`r format(Sys.time(), '%d de %B de %Y')`"
 author:
 - "Andrés Millán"
 - "Paula Villanueva"
+
+documentclass: scrreprt
+geometry:
+- top=1.5in
+- bottom=1in
+- right=1in
+- left=1in
+
+numbersections: true
+
+mainfont: 'Crimson Pro'
+fontsize: 12pt
+monofont: 'JuliaMono'
+monofontoptions:
+ - Scale=0.6
+header-includes:
+ - \usepackage{fvextra}
+ - \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+urlcolor: blue
+
 output:
   html_document:
     toc: true
@@ -17,7 +37,6 @@ output:
     toc: true
     toc_depth: 3
     number_sections: true
-    theme: united
     highlight: tango
 ---
 
@@ -68,17 +87,20 @@ A continuación se muestra una tabla con los estadísticos descriptivos básicos
 ```{r, echo=FALSE}
 summary(datos)
 ```
+
+
 ```{R, echo=FALSE}
+print("Desviaciones estándar:")
 sapply(datos, sd)
 ```
 
 En la siguiente gráfica se muestran los diagramas de cajas de las variables.
 
-```{R, echo=FALSE}
+```{R, echo=FALSE, fig.cap="Diagrama de cajas", fig.width = 8, fig.asp = 0.8, fig.}
 boxplot (
   datos,
   main = "Diagrama de cajas",
-  xlab = "Indicadores\n\nFigura 1",
+  xlab = "Indicadores",
   ylab = "Valor",
   col = c(1 : 15)
 )
@@ -121,7 +143,7 @@ check_outliers(datos, method = "mahalanobis")
 
 Tras normalizar el conjunto de datos, estudiamos cómo se distribuían las variables, produciendo el siguiente resultado:
 
-```{R, echo=FALSE}
+```{R, echo=FALSE, fig.cap="Aproximación a normales univariantes"}
 par(mar = c(1, 1, 1, 1))
 par(mfrow = c(2, 4))
 
@@ -139,31 +161,31 @@ Se ha comprobado que existe correlación entre las variables usando el test de B
 
 Se han obtenido las desviaciones típicas de cada componente principal y la proporción de varianza explicada y acumulada. Podemos observar en la siguiente imagen un análisis gráfico de la varianza explicada.
 
-```{R, echo=FALSE}
+```{R, echo=FALSE, fig.cap="Análisis gráfico de la varianza explicada", fig.height=4, fig.height=4}
 ggplot(
   data = data.frame(varianza_explicada, pc = 1:8),
   aes(x = pc, y = varianza_explicada, fill = varianza_explicada)
 ) + geom_col(width = 0.3) +
     scale_y_continuous(limits = c(0,0.6)) +
     theme_minimal() +
-    labs(x = "Componente principal", y= "Proporcion de varianza explicada")
+    labs(x = "Número de componentes principales", y= "Proporción de varianza explicada")
 ```
 
 De la misma forma, obtenemos un análisis gráfico de la varianza acumulada.
 
-```{R, echo=FALSE}
+```{R, echo=FALSE, fig.cap="Análisis gráfico de varianza acumulada", fig.height=4, fig.height=4}
 ggplot(
   data = data.frame(varianza_acum, pc = 1:8),
   aes(x = pc, y = varianza_acum, fill = varianza_acum )
 ) + geom_col(width = 0.5) +
     scale_y_continuous(limits = c(0,1)) +
     theme_minimal() +
-    labs(x = "Componente principal", y = "Proporcion varianza acumulada")
+    labs(x = "Número de componentes principales", y = "Proporción varianza acumulada")
 ```
 
 A continuación, se seleccionaron el número de componentes principales óptimo para reducir la dimensión mediante variables observables. Mediante el método del codo, se ha podido analizar gráficamente y elegir las componentes principales.
 
-```{R, echo=FALSE}
+```{R, echo=FALSE, fig.cap="Método del codo", fig.height=4, fig.height=4}
 ggplot(
   data = data.frame(varianza_acum, pc = 1:8),
   aes(x = pc, y = varianza_acum)
@@ -178,7 +200,7 @@ En las siguientes gráficas podremos observar la representación conjunta de var
 
 Variables y observaciones en la primera y segunda componente principal:
 
-```{R, echo=FALSE}
+```{R, echo=FALSE, fig.cap="Contribuciones para la primera y segunda componente", fig.height=4, fig.height=5}
 fviz_pca(
   PCA,
   axes = c(1, 2),
@@ -192,7 +214,7 @@ fviz_pca(
 
 Variables y observaciones en la primera y tercera componente principal:
 
-```{R, echo=FALSE}
+```{R, echo=FALSE, fig.cap="Contribuciones para la primera y tercera componente", fig.height=4, fig.height=5}
 fviz_pca(
   PCA,
   axes = c(1, 3),
@@ -207,7 +229,7 @@ fviz_pca(
 
 Variables y observaciones en la segunda y tercera componente principal:
 
-```{R, echo=FALSE}
+```{R, echo=FALSE, fig.cap="Contribuciones para la segunda y tercera componente", fig.height=4, fig.height=5}
 fviz_pca(
   PCA,
   axes = c(2, 3),
@@ -224,23 +246,23 @@ fviz_pca(
 
 Tras realizar el ACP, procedemos a realizar el Análisis Factorial (AF), el cual tiene sentido porque las variables están correladas:
 
-```{R, echo=FALSE}
+```{R, echo=FALSE, fig.cap="Correlaciones", fig.height=4, fig.height=4}
 ggcorrplot(poly_cor, type = "lower", hc.order = T)
 ```
 
 Una vez comparadas las salidas con el método del factor principal y con el de máxima verosimilitud, comparamos las comunalidades y las unicidades. De esta forma, ya podemos determinar el número óptimo de factores basándonos en los siguientes gráficos.
 
-```{R, echo=FALSE}
+```{R, echo=FALSE, fig.cap="Scree plot"}
 scree(poly_cor)
 ```
 
-```{R, echo=FALSE}
+```{R, echo=FALSE, fig.cap="Análisis paralelo de scree plots"}
 fa.parallel(poly_cor, n.obs = 13, fa = "fa", fm = "mle")
 ```
 
 Estimamos el modelo factorial con 3 factores implementando una rotación tipo varimax para buscar una interpretación más simple.
 
-```{R, echo=FALSE}
+```{R, echo=FALSE, fig.cap="Contribuciones", fig.height=4, fig.height=4}
 fa.diagram(modelo_varimax)
 ```
 
@@ -252,7 +274,7 @@ Previo al análisis cluster, se ha analizado la normalidad multivariante de los 
 
 Tras realizar el test de Royston, obtenemos la gráfica que se muestra a continuación.
 
-```{R, echo=FALSE}
+```{R, echo=FALSE, fig.cap="Test de Royston", fig.height=4, fig.height=7}
 royston_test <- mvn(data = datos_pca, mvnTest = "royston", multivariatePlot = "qq")
 ```
 
@@ -260,18 +282,19 @@ royston_test <- mvn(data = datos_pca, mvnTest = "royston", multivariatePlot = "q
 
 Para finalizar, se han aplicado técnicas de clustering. Hemos llegado a la conclusión de que el número óptimo de clusters para este dataset es 4:
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.cap="Número óptimo de clusters", fig.height=5, fig.height=5}
 fviz_nbclust(datos_normalizados, kmeans, method = "silhouette")
 ```
 
 K-Means produce las siguientes particiones:
 
-```{r}
+```{r, fig.cap="Clusters"}
 p3
 ```
 
 Este modelo nos arroja las siguientes siluetas:
-```{R, echo=FALSE}
+
+```{R, echo=FALSE, fig.cap="Siluetas de K-Means, k = 4", fig.height=6, fig.height=7}
 plot(silueta)
 ```
 
@@ -296,10 +319,12 @@ Ambos obtienen un p-valor por debajo de 0.05. Es probable que supongan una fuent
 
 En cuanto al Análisis Factorial de la sección [4.2.2](#Análisis factorial), se ha tomado la decisión de estimar 3 factores apoyándose en las gráficas obtenidas. Sin embargo, el análisis paralelo sugería que se estimasen 2 factores, lo cual produciría [un caso de ultra-Heywood](https://v8doc.sas.com/sashtml/stat/chap26/sect21.htm).
 
-<div style="display: block; margin: 0 auto">
-  <img src="https://imgs.xkcd.com/comics/confounding_variables.png" alt="xkcd" style="display: block; margin: 0 auto">
-  <p style="text-align: center;">Dos es poco, tres es mucho. <i>Fuente: https://xkcd.com/2560/</i></p>
-</div>
+
+\begin{figure}
+\includegraphics[width=0.8\textwidth, height=!]{./img/xkcd.png}
+\centering
+\caption{\textit{Dos es poco, tres es mucho. Fuente: https://xkcd.com/2560/}}
+\end{figure}
 
 
 Finalmente, hay otro matiz muy importante que debemos discutir. **Nuestro dataset solo tiene 13 instancias**. Hacer un análisis de calidad con tan pocos datos no es posible. En general, clustering necesita decenas de instancias como mínimo para producir resultados realistas.
@@ -315,4 +340,11 @@ Para realizar este trabajo, no se han distribuido las tareas, sino que ambos hem
 
 ```{R, purl=FALSE, echo=FALSE, results=FALSE, message=FALSE, fig.show='hide', warning=FALSE, eval=FALSE}
 rmarkdown::render('Entrega.rmd', encoding = 'UTF-8', output_format = 'html_document')
+```
+
+```{R, purl=FALSE, echo=FALSE, results=FALSE, message=FALSE, fig.show='hide', warning=FALSE, eval=FALSE}
+#rmarkdown::render('Entrega.rmd', encoding = 'UTF-8', output_format = 'pdf_document')
+knitr::knit2pandoc('Entrega.rmd')
+system2(command = "pandoc", args = c("Entrega.md ", "-o ", "Entrega.pdf ", "--pdf-engine=xelatex"))
+
 ```
