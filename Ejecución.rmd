@@ -45,12 +45,9 @@ datos
 
 Según el problema, hay 13 empresas pero observamos que hay 14 filas. Esto nos hace sospechar que hay una fila errónea.
 
-
-
 ## Recodificaciones
 
 No es necesario recodificar o agrupar los datos, pues como observamos en el archivo de datos, tenemos que todas las variables son numéricas.
-
 
 ## Valores perdidos
 
@@ -92,8 +89,6 @@ boxplot (
 ```
 
 Además, para obtener el coeficiente de simetría utilizaremos el comando `skewness`.
-
-https://www.programmingr.com/statistics/skewness/
 
 ```{r}
 library(moments)
@@ -152,8 +147,12 @@ invisible(apply(datos_normalizados, 2, function(x) {
 }))
 ```
 
-(Comentar esto)
-
+```{r, echo=FALSE}
+shapiro.test(datos_normalizados[, "x6"])
+```
+```{r, echo=FALSE}
+shapiro.test(datos_normalizados[, "x8"])
+```
 
 # Análisis exploratorio multivariante
 
@@ -176,7 +175,6 @@ Observamos que obtenemos un `p-value` prácticamente nulo, por lo que esto indic
 ```{r}
 round(cor(datos_pca), 5)
 ```
-
 
 ## Tratar outliers si no se ha hecho antes
 
@@ -247,7 +245,7 @@ ggplot(
     labs(x = "Componente principal", y= "Proporcion de varianza explicada")
 ```
 
-Con el siguiente comando hacemos un análisis gráfico de la varianza explicada.
+Con el siguiente comando hacemos un análisis gráfico de la varianza acumulada.
 
 ```{R}
 varianza_acum <- cumsum(varianza_explicada)
@@ -526,6 +524,11 @@ p3
 
 ## Validación básica; matriz de confusión
 
-```{R, purl=FALSE, echo=FALSE, results=FALSE, message=FALSE, fig.show='hide', warning=FALSE}
-knitr::purl("./Ejecución.rmd")
+```{r}
+silueta <- silhouette(k4$cluster, dist(datos_normalizados))
+plot(silueta)
+```
+
+```{R, purl=FALSE, eval=FALSE, echo=FALSE, results=FALSE, message=FALSE, fig.show='hide', warning=FALSE}
+rmarkdown::render('Ejecución.rmd', encoding = 'UTF-8', output_format = 'html_document')
 ```

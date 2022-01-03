@@ -8,6 +8,7 @@ output:
   html_document:
     toc: true
     toc_depth: 3
+    toc_float: true
     number_sections: true
     theme: united
     highlight: tango
@@ -20,18 +21,20 @@ output:
     highlight: tango
 ---
 
-```{R, echo=FALSE, results=FALSE, message=FALSE, fig.show='hide', warning=FALSE}
+```{R, purl=FALSE, echo=FALSE, results=FALSE, message=FALSE, fig.show='hide', warning=FALSE}
+# Carga un archivo .R con las variables del otro documento.
 source('./Ejecución.R')
 ```
 
+
 # Abstract
 
-En esta práctica se ha realizado el análisis exploratorio sobre un cierto conjunto de datos. Este dataset recoge 8 indicadores económicos de 13 empresas. Tras estudiar la información recogida en el conjunto, tratando posibles valores perdidos y outliers, se han aplicado dos tipos de técnicas:
+Se ha realizado un análisis exploratorio de un conjunto de datos. Este dataset recoge 8 indicadores económicos de 13 empresas. Tras estudiar la información recogida en el conjunto, tratando posibles valores perdidos y outliers, se han aplicado dos tipos de técnicas:
 
-- **Análisis univariante numérico y gráfico**. En él, se ha realizado un análisis descriptivo numérico clásico y un análisis de supuesto de normalidad.
+- **Análisis univariante numérico y gráfico**. En él, se ha elaborado un análisis descriptivo numérico clásico y un análisis de supuesto de normalidad.
 - **Técnicas multivariantes**: se ha estudiado la correlación entre variables, la reducción de la dimensión mediante variables observables y latentes. Además, se ha estudiado la normalidad multivariante de los datos.
 
-Finalmente, se ha construido un clasificador mediante un análisis discriminante lineal y otro cuadrático, comprobando cómo de eficaz resulta aplicarlo.
+Finalmente, se ha construido un clasificador basado en clustering no jerárquico con el fin de estudiar cómo se agrupan las diferentes empresas. Descubrimos que existen 4 grupos diferentes.
 
 
 # Introducción
@@ -49,11 +52,6 @@ Finalmente, para completar nuestro objetivo, se ha realizado un análisis cluste
 
 ## Materiales
 
-- Hablar dataset
-- Estadísticos descriptivos básicos
-- Boxplots
-- Hablar sobre los posibles outliers, que decidimos no quitarlos.
-
 La base de datos elegida contiene un grupo constituido por 13 empresas que se ha clasificado según las puntuaciones obtenidas en 8 indicadores económicos:
 
 - X1: Indicador de volumen de facturación.
@@ -67,19 +65,20 @@ La base de datos elegida contiene un grupo constituido por 13 empresas que se ha
 
 A continuación se muestra una tabla con los estadísticos descriptivos básicos.
 
-```{r}
+```{r, echo=FALSE}
 summary(datos)
 ```
-```{R}
+```{R, echo=FALSE}
 sapply(datos, sd)
 ```
 
+En la siguiente gráfica se muestran los diagramas de cajas de las variables.
 
-```{R}
+```{R, echo=FALSE}
 boxplot (
-  datos_pca,
-  main = "Análisis exploratorio de datos",
-  xlab = "Indicadores",
+  datos,
+  main = "Diagrama de cajas",
+  xlab = "Indicadores\n\nFigura 1",
   ylab = "Valor",
   col = c(1 : 15)
 )
@@ -88,22 +87,232 @@ boxplot (
 
 ## Métodos estadísticos
 
-- Indicar técnicas usadas.
+En este apartado se indican las distintas técnicas estadísticas que se han utilizado.
 
+Primero, se ha realizado un análisis numérico y gráfico de cada variable. De esta forma, mediante en visionado de la estructura del archivo de datos, se han estudiado las posibles recodificaciones y valores perdidos. También se ha realizado un análisis descriptivo numérico clásico, esto es, usando las funciones `summary`, `boxplot` y `skewness` hemos obtenido las medidas de tendencia central, dispersión, cuartiles, simetría, etc.
+Por otra parte, con la función `check_outliers` hemos detectado los posibles outliers mediante el método de mahalanobis.
+Para comprobar el supuesto de normalidad, hemos utilizado `colMeans` y para normalizar los datos hemos usado `scale`. De esta forma, podemos visualizar la normalidad con `qqplot`.
 
-En este apartado se indican las distintas técnicas estadísticas que se han utilizado. Primero, se ha realizado un análisis numérico y gráfico de cada variable. De esta forma, mediante en visionado de la estructura del archivo de datos, no se han detectado recodificaciones. Sin embargo, sí que se han detectado valores perdidos en una variable. También se ha realizado un análisis descriptivo numérico clásico, esto es, usando las funciones `summary`, `boxplot` y `skewness` hemos obtenido las medidas de tendencia central, dispersión, cuartiles, simetría, etc.
+Con respecto al análisis exploratorio multivariante, se ha utilizado el test de Bartlett, `cortest.bartlett`, para estudiar la correlación entre las variables.
+En cuanto al Análisis de Componentes Principales, éste se ha realizado con `prcomp` y se han utilizado técnicas gráficas, tales como `ggplot` y `fviz_pca`.
+Sobre el AF, se han utilizado otras técnicas gráficas, como `ggcorrplot`, `scree`, `parallel` y `diagram`, y `factanal` para realizar el test de hipótesis que constrasta si el número de factores es suficiente.
+Para realizar el análisis de la normalidad multivariante, se ha utilizado el paquete `MVN`. Específicamente, hemos usado dos tests diferentes: el de Henze-Zirkler y el de Royston.
+
+Finalmente, para realizar el agrupamiento de los objetos, se ha utilizado la técnica `kmeans`, variando el número de clusters con el fin de comprobar cómo se agrupan las empresas.
 
 
 # Resultados
 
-- Resumen de lo más destacado
-- Probablemente debamos usar bastantes gráficas.
-- Exposición objetiva.
+En este apartado se mostrarán los resultados obtenidos aplicando las técnicas mencionadas anteriormente.
 
-# Discusión
+## Análisis exploratorio univariante
 
-- Recordar objetivo
-- Interpretación de los resultados
-- Discutir cómo se han conseguido esos resultados
+Para estudiar nuestro conjunto de datos, podemos obtener el coeficiente de simetría de la distribución estadística.
 
-# Conclusiones
+```{R}
+skewness(datos)
+```
+
+Antes de proceder con el PCA y el AF, es necesario tratar los outliers. Este fue un punto de discusión importante, pues como vimos en la figura 1, se muestran tres outliers en las variables x4, x5. Sin embargo, utilizando el método de Mahalanobis, encontramos que no se detecta ninguno:
+
+```{R}
+check_outliers(datos, method = "mahalanobis")
+```
+
+Tras normalizar el conjunto de datos, estudiamos cómo se distribuían las variables, produciendo el siguiente resultado:
+
+```{R, echo=FALSE}
+par(mar = c(1, 1, 1, 1))
+par(mfrow = c(2, 4))
+
+invisible(apply(datos_normalizados, 2, function(x) {
+  qqnorm(x, main = NULL)
+  abline(a = 0, b = 1, col = "#00b894")
+}))
+```
+
+## Análisis explotatorio multivariante
+
+### Análisis de componentes principales
+
+Se ha comprobado que existe correlación entre las variables usando el test de Bartlett, pues obteníamos un `p-valor` prácticamente nulo. Esto indica que las variables están correladas, luego procederemos a realizar un Análisis de Componentes Principales (ACP).
+
+Se han obtenido las desviaciones típicas de cada componente principal y la proporción de varianza explicada y acumulada. Podemos observar en la siguiente imagen un análisis gráfico de la varianza explicada.
+
+```{R, echo=FALSE}
+ggplot(
+  data = data.frame(varianza_explicada, pc = 1:8),
+  aes(x = pc, y = varianza_explicada, fill = varianza_explicada)
+) + geom_col(width = 0.3) +
+    scale_y_continuous(limits = c(0,0.6)) +
+    theme_minimal() +
+    labs(x = "Componente principal", y= "Proporcion de varianza explicada")
+```
+
+De la misma forma, obtenemos un análisis gráfico de la varianza acumulada.
+
+```{R, echo=FALSE}
+ggplot(
+  data = data.frame(varianza_acum, pc = 1:8),
+  aes(x = pc, y = varianza_acum, fill = varianza_acum )
+) + geom_col(width = 0.5) +
+    scale_y_continuous(limits = c(0,1)) +
+    theme_minimal() +
+    labs(x = "Componente principal", y = "Proporcion varianza acumulada")
+```
+
+A continuación, se seleccionaron el número de componentes principales óptimo para reducir la dimensión mediante variables observables. Mediante el método del codo, se ha podido analizar gráficamente y elegir las componentes principales.
+
+```{R, echo=FALSE}
+ggplot(
+  data = data.frame(varianza_acum, pc = 1:8),
+  aes(x = pc, y = varianza_acum)
+) + geom_line(size = 1, colour = "#00b894") +
+    geom_point(size = 2.5, colour = "#2c3e50") +
+    scale_y_continuous(limits = c(0, 1)) +
+    theme_minimal() +
+    labs(x = "Componente principal", y = "Proporcion varianza acumulada")
+```
+
+En las siguientes gráficas podremos observar la representación conjunta de variables y observaciones que relaciona visualmente las posibles relaciones entre las observaciones, las contribuciones de los individuos a las varianzas de las componentes y el peso de las variables en cada componentes principal.
+
+Variables y observaciones en la primera y segunda componente principal:
+
+```{R, echo=FALSE}
+fviz_pca(
+  PCA,
+  axes = c(1, 2),
+  alpha.ind = "contrib",
+  col.var = "cos2", col.ind = "#2c3e50",
+  gradient.cols = c("#ddd839", "#f7a438", "#e9473b"),
+  repel = TRUE,
+  legend.title = "Distancia"
+) + theme_bw()
+```
+
+Variables y observaciones en la primera y tercera componente principal:
+
+```{R, echo=FALSE}
+fviz_pca(
+  PCA,
+  axes = c(1, 3),
+  alpha.ind = "contrib",
+  col.var = "cos2",
+  col.ind = "#2c3e50",
+  gradient.cols = c("#ddd839", "#f7a438", "#e9473b"),
+  repel = TRUE,
+  legend.title = "Distancia"
+) + theme_bw()
+```
+
+Variables y observaciones en la segunda y tercera componente principal:
+
+```{R, echo=FALSE}
+fviz_pca(
+  PCA,
+  axes = c(2, 3),
+  alpha.ind = "contrib",
+  col.var = "cos2",
+  col.ind = "#2c3e50",
+  gradient.cols = c("#ddd839", "#f7a438", "#e9473b"),
+  repel = TRUE,
+  legend.title = "Distancia"
+  ) + theme_bw()
+```
+
+### Análisis factorial
+
+Tras realizar el ACP, procedemos a realizar el Análisis Factorial (AF), el cual tiene sentido porque las variables están correladas:
+
+```{R, echo=FALSE}
+ggcorrplot(poly_cor, type = "lower", hc.order = T)
+```
+
+Una vez comparadas las salidas con el método del factor principal y con el de máxima verosimilitud, comparamos las comunalidades y las unicidades. De esta forma, ya podemos determinar el número óptimo de factores basándonos en los siguientes gráficos.
+
+```{R, echo=FALSE}
+scree(poly_cor)
+```
+
+```{R, echo=FALSE}
+fa.parallel(poly_cor, n.obs = 13, fa = "fa", fm = "mle")
+```
+
+Estimamos el modelo factorial con 3 factores implementando una rotación tipo varimax para buscar una interpretación más simple.
+
+```{R, echo=FALSE}
+fa.diagram(modelo_varimax)
+```
+
+Finalmente, con el test de hipótesis contrastamos si el número de factores es suficiente, lo cual fue cierto.
+
+### Análisis de la normalidad multivariante
+
+Previo al análisis cluster, se ha analizado la normalidad multivariante de los datos con los tests de Royston y de Henze-Zirkler. Sin embargo ninguno de los dos tests encuentran evidencias al 5% de significación de falta de normalidad multivariante.
+
+Tras realizar el test de Royston, obtenemos la gráfica que se muestra a continuación.
+
+```{R, echo=FALSE}
+royston_test <- mvn(data = datos_pca, mvnTest = "royston", multivariatePlot = "qq")
+```
+
+## Clasificación
+
+Para finalizar, se han aplicado técnicas de clustering. Hemos llegado a la conclusión de que el número óptimo de clusters para este dataset es 4:
+
+```{r, echo=FALSE}
+fviz_nbclust(datos_normalizados, kmeans, method = "silhouette")
+```
+
+K-Means produce las siguientes particiones:
+
+```{r}
+p3
+```
+
+Este modelo nos arroja las siguientes siluetas:
+```{R, echo=FALSE}
+plot(silueta)
+```
+
+# Discusión y conclusiones
+
+El objetivo principal consistía en realizar un agrupamiento de los objetos formando clusters de objetos con un alto grado de homogeneidad interna y heterogeneidad entre clusters.
+
+En primer lugar, se ha obtenido el coeficiente de simetría de cada variable en la sección [4.1](#Análisis exploratorio univariante). En este problema, hemos obtenido valores positivos o negativos. Un valor negativo significa que la distribución está sesgada a la derecha, mientras que un valor positivo indica que la distribución se encuentra sesgada hacia la izquierda.
+
+Uno de los puntos más controvertidos de este trabajo es la decisión de eliminar outliers. Como podemos observar en el diagrama de cajas de la sección  [3.1](#Materiales), se muestran tres outliers en las variables `x4` y `x5`. Sin embargo, se ha tomado la decisión de no eliminarlos, pues si no fuera así, se ha comprobado que las métricas de rendimiento bajaban.
+
+Por otra parte, hemos observado que algunas de nuestras variables no se distribuyen con respecto a una normal. Esto queda evidenciado por la gráfica de la sección [4.1](#Análisis exploratorio univariante). En concreto, las variables x6 y x8 dan problemas. Realizando un test de shapiro para estas variables, se obtiene lo siguiente:
+
+```{r, echo=FALSE}
+shapiro.test(datos_normalizados[, "x6"])
+```
+```{r, echo=FALSE}
+shapiro.test(datos_normalizados[, "x8"])
+```
+
+Ambos obtienen un p-valor por debajo de 0.05. Es probable que supongan una fuente de imprecisiones a la hora de pasar a la distribución normal multivariante.
+
+En cuanto al Análisis Factorial de la sección [4.2.2](#Análisis factorial), se ha tomado la decisión de estimar 3 factores apoyándose en las gráficas obtenidas. Sin embargo, el análisis paralelo sugería que se estimasen 2 factores, lo cual produciría [un caso de ultra-Heywood](https://v8doc.sas.com/sashtml/stat/chap26/sect21.htm).
+
+<div style="display: block; margin: 0 auto">
+  <img src="https://imgs.xkcd.com/comics/confounding_variables.png" alt="xkcd" style="display: block; margin: 0 auto">
+  <p style="text-align: center;">Dos es poco, tres es mucho. <i>Fuente: https://xkcd.com/2560/</i></p>
+</div>
+
+
+Finalmente, hay otro matiz muy importante que debemos discutir. **Nuestro dataset solo tiene 13 instancias**. Hacer un análisis de calidad con tan pocos datos no es posible. En general, clustering necesita decenas de instancias como mínimo para producir resultados realistas.
+
+Para ejemplificar esto, la gráfica de las siluetas. Se genera una silueta de 0.37, la cual es considerablemente baja. Mirando los clusters, podemos ver cómo en el cluster 2 existen 2 elementos, mientras que en el 3 hay 3. Con esto no podemos llegar a ninguna conclusión.
+
+Con el fin de encontrar agrupaciones pertinentes y producir un análisis de calidad, sería necesario ampliar el número de empresas. De esta forma, se podrían observar patrones más relevantes.
+
+
+# Distribución de las tareas entre las personas implicadas
+
+Para realizar este trabajo, no se han distribuido las tareas, sino que ambos hemos hecho todas las tareas a la vez, supervisando el uno al otro y poniendo en común nuestro conocimiento.
+
+```{R, purl=FALSE, echo=FALSE, results=FALSE, message=FALSE, fig.show='hide', warning=FALSE, eval=FALSE}
+rmarkdown::render('Entrega.rmd', encoding = 'UTF-8', output_format = 'html_document')
+```
