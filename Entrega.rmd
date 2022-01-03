@@ -345,6 +345,5 @@ rmarkdown::render('Entrega.rmd', encoding = 'UTF-8', output_format = 'html_docum
 ```{R, purl=FALSE, echo=FALSE, results=FALSE, message=FALSE, fig.show='hide', warning=FALSE, eval=FALSE}
 #rmarkdown::render('Entrega.rmd', encoding = 'UTF-8', output_format = 'pdf_document')
 knitr::knit2pandoc('Entrega.rmd')
-system2(command = "pandoc", args = c("Entrega.md ", "-o ", "Entrega.pdf ", "--pdf-engine=xelatex"))
-
+system2(command = "pandoc", args = c("Entrega.md ", "-f", "markdown-implicit_figures", "-o ", "Entrega.pdf ", "--pdf-engine=xelatex"))
 ```
